@@ -30,7 +30,7 @@
     </script>
     <script>
         var dojoConfig = {
-            serverIP: "beta.arcgisonline.cn:8888"
+            serverIP: "beta.arcgisonline.cn:8888/"
         };
     </script>
     <script src="http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/init.js"></script>
@@ -51,27 +51,19 @@
 
         require([
             "esri/map",
-            "esri/dijit/LocateButton",
             "esri/layers/ArcGISTiledMapServiceLayer",
             "dojo/domReady!"
         ], function(
-                Map, LocateButton
+                Map,ArcGISTiledMapServiceLayer
                 )  {
             dojo.parser.parse();
             map = new Map("map", {
-                center: [116.33, 39.9],
+                center: [116.40, 39.9],
                 zoom: 12
             });
 
-            geoLocate = new LocateButton({
-                map: map
-            }, "LocateButton");
-            geoLocate.startup();
-
-//            var tiled = new Tiled("http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer");
-//            map.addLayer(tiled);
             var myServiceURL = "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer";
-            var myLayer = new ArcGISTiledMapServiceLayer(myServiceURL, { displayLevels:[12,13,14,15,16]});
+            var myLayer = new ArcGISTiledMapServiceLayer(myServiceURL, { displayLevels:[12,13,14,15]});
             map.addLayer(myLayer);
 
 
@@ -81,7 +73,6 @@
 </head>
 <body>
 <div id="map" class="map">
-    <div id="LocateButton"></div>
 </div>
 </body>
 </html>
