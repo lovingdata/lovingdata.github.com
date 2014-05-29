@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
     <title>GridMap</title>
-    <link rel="stylesheet" type="text/css" href="http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/js/esri/css/esri.css">
+    <link rel="stylesheet" type="text/css" href="http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/js/esri/css/esri.css" />
     <style>
         html, body, #map {
             padding:0;
@@ -18,8 +18,34 @@
             z-index: 50;
         }
     </style>
-    <script src="//http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/init.js"></script>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-51459231-1', 'github.com');
+        ga('send', 'pageview');
+
+    </script>
+    <script>
+        var dojoConfig = {
+            serverIP: "beta.arcgisonline.cn:8888"
+        };
+    </script>
+    <script src="http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/init.js"></script>
     <script type="text/javascript" src="http://beta.arcgisonline.cn:8888/static/jquery-1.9.1.js"></script>
+    <style>
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+        #map{
+            padding:0;
+        }
+        #flowContainer{
+            font: inherit;
+            line-height: normal;
+            color: inherit;
+        }
+    </style>
     <script>
         var map;
 
@@ -31,21 +57,27 @@
         ], function(
                 Map, LocateButton
                 )  {
-
+            dojo.parser.parse();
             map = new Map("map", {
                 center: [116.33, 39.9],
-                zoom: 4
-//                sliderStyle: "large"
+                zoom: 12
             });
-            var tiled = new Tiled("http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer");
-            map.addLayer(tiled);
+
             geoLocate = new LocateButton({
                 map: map
             }, "LocateButton");
             geoLocate.startup();
 
+            var tiled = new Tiled("http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer");
+            map.addLayer(tiled);
+//            var myServiceURL = "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer";
+//            var myLayer = new ArcGISTiledMapServiceLayer(myServiceURL, { displayLevels:[12,13,14,15,16]});
+//            map.addLayer(myLayer);
+
+
         });
     </script>
+
 </head>
 <body>
 <div id="map" class="map">
