@@ -304,6 +304,9 @@
                     y = (ymin+ymax)/2;
                     Rx = (xmax-xmin)/2;
                     Ry = ymax-ymin;
+                    rr = Rx;
+
+                    if ((Ry/2)>Rx){rr=Ry/2;}
 
                     var zoomlevel = theMap.getZoom();
                     //console.log(zoomlevel);
@@ -333,7 +336,7 @@
                     var params = {
                         lon: outpoint.x,
                         lat: outpoint.y,
-                        rad: Rx,
+                        rad: rr,
                         box_rad: box_rad,
                         box_typ: boxtype
                     };
