@@ -26,6 +26,7 @@
         require([
             "esri/map",
             "esri/dijit/LocateButton",
+            "esri/layers/ArcGISTiledMapServiceLayer",
             "dojo/domReady!"
         ], function(
                 Map, LocateButton
@@ -33,11 +34,11 @@
 
             map = new Map("map", {
                 center: [116.33, 39.9],
-                zoom: 4,
-                basemap: "streets",
-                sliderStyle: "large"
+                zoom: 4
+//                sliderStyle: "large"
             });
-
+            var tiled = new Tiled("http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer");
+            map.addLayer(tiled);
             geoLocate = new LocateButton({
                 map: map
             }, "LocateButton");
