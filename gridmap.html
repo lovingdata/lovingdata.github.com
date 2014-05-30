@@ -1,0 +1,416 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>GridMap</title>
+    <link rel="stylesheet" type="text/css" href="http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/js/esri/css/esri.css" />
+    <style>
+        html, body, #map {
+            padding:0;
+            margin:0;
+            height:100%;
+        }
+        #LocateButton {
+            position: absolute;
+            top: 95px;
+            left: 20px;
+            z-index: 50;
+        }
+    </style>
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-51459231-1', 'github.com');
+        ga('send', 'pageview');
+
+    </script>
+    <script>
+        var dojoConfig = {
+            serverIP: "beta.arcgisonline.cn:8888/"
+        };
+    </script>
+    <script src="http://beta.arcgisonline.cn:8888/arcgis_js_api/v38/library/3.8/init.js"></script>
+    <script type="text/javascript" src="http://beta.arcgisonline.cn:8888/static/jquery-1.9.1.js"></script>
+    <style>
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
+        #map{
+            padding:0;
+        }
+        #flowContainer{
+            font: inherit;
+            line-height: normal;
+            color: inherit;
+        }
+    </style>
+    <script type="text/javascript">
+    if (!Array.prototype.forEach) {
+        Array.prototype.forEach = function(callback, thisArg) {
+            var T, k;
+            if (this == null) {
+                throw new TypeError(" this is null or not defined");
+            }
+            var O = Object(this);
+            var len = O.length >>> 0; // Hack to convert O.length to a UInt32
+            if ({}.toString.call(callback) != "[object Function]") {
+                throw new TypeError(callback + " is not a function");
+            }
+            if (thisArg) {
+                T = thisArg;
+            }
+            k = 0;
+            while (k < len) {
+                var kValue;
+                if (k in O) {
+                    kValue = O[k];
+                    callback.call(T, kValue, k, O);
+                }
+                k++;
+            }
+        };
+    }
+    function square(obj){
+        squareRes = new Array();
+        for(var i = 0; i<obj['val'].length;i++)
+        {
+            x = obj['val'][i][0];
+            y = obj['val'][i][1];
+            r = obj['val'][i][2];
+            attr = obj['val'][i][3];
+            var squarelist = [[x+r,y+r],[x-r,y+r],[x-r,y-r],[x+r,y-r],[x+r,y+r]];
+            //console.log(squarelist)
+            squareVal = {"list":squarelist,"attr":attr};
+            squareRes.push(squareVal)
+        }
+        return squareRes
+    }
+
+
+
+    function hexagon(obj){
+        hexagonRes = new Array();
+        for(var i = 0; i<obj['val'].length;i++)
+        {
+            x = obj['val'][i][0];
+            y = obj['val'][i][1];
+            r = obj['val'][i][2];
+            attr = obj['val'][i][3];
+            var hexagonlist = [[x+2*r*Math.sqrt(3)/3,y],[x+r*Math.sqrt(3)/3,y+r],[x-r*Math.sqrt(3)/3,y+r],[x-2*r*Math.sqrt(3)/3,y],[x-r*Math.sqrt(3)/3,y-r],[x+r*Math.sqrt(3)/3,y-r],[x+2*r*Math.sqrt(3)/3,y]];
+            hexagonVal = {"list":hexagonlist,"attr":attr};
+            hexagonRes.push(hexagonVal)
+        }
+        return hexagonRes
+    }
+
+    function getAttrlist(res,attrName){
+        attrList = new Array();
+        for(i = 0;i<res.length;i++)
+        {
+            var value = res[i]['attr'][attrName];
+            attrList.push(value)
+        }
+        return attrList
+    }
+
+    function sortNumber(a,b)
+    {
+        return a - b
+    }
+
+
+    Array.prototype.uniqueEx=function(){
+        var l=this.length;
+        var arr=[];
+        var tmp={}
+        for(var i=0;i<l;i++){
+            if(!tmp[this[i]]){
+                arr.push(this[i]);
+                tmp[this[i]]=1;
+            }
+        }
+        arr.sort(sortNumber)
+        return arr;
+    }
+
+    function breakNum(numList){
+        len = numList.length;
+        cut = parseInt(len/5);
+        var breakList;
+        if (len % 5 == 0 || len % 5 == 1)
+        {
+            breakList = [numList[cut-1],numList[2*cut-1],numList[3*cut-1],numList[4*cut-1]];
+        }
+        else if  (len % 5 == 2)
+        {
+            breakList = [numList[cut],numList[2*cut],numList[3*cut],numList[4*cut]];
+        }
+        else if  (len % 5 == 3)
+        {
+            breakList = [numList[cut],numList[2*cut],numList[3*cut+1],numList[4*cut+1]];
+        }
+        else if  (len % 5 == 4)
+        {
+            breakList = [numList[cut],numList[2*cut+1],numList[3*cut+1],numList[4*cut+1]];
+        }
+
+        return breakList
+    }
+
+
+    def  = [[2, 99, 0,120],[88, 176, 0,120],[150, 209, 0,120],[255, 213, 0,120],[255, 38, 0,120]];
+    blue = [[198,219,239,180],[158,202,225,180],[107,174,214,180],[49,130,189,180],[8,81,156,180]];
+    red = [[252,187,161,180],[252,146,114,180],[251,106,74,180],[222,45,38,180],[165,15,21,180]];
+    green = [[199,233,192,180],[161,217,155,180],[116,196,118,180],[49,163,84,180],[0,109,44,180]];
+    orange = [[254,196,79,120],[254,153,41,120],[236,112,20,120],[204,76,2,120],[140,45,4,120]];
+
+    var coloful = [def,blue,red,green,orange];
+
+
+    function geojson(res,breakList,attrName,ConditionNumber){
+
+        geojsons = new Array();
+        for(i = 0;i<res.length;i++)
+        {
+            //console.log(res[i]['attr'])
+            var colorVal;
+            var geometry = {"rings": [res[i]['list']] , "spatialReference": {"wkid": 102100}};
+            var attributes = res[i]['attr'];
+            attrValue =  res[i]['attr'][attrName];
+
+            if (attrValue<=breakList[0])
+            {
+                colorVal = ConditionNumber[0];
+            }
+            else if(breakList[1]>=attrValue)
+            {
+                colorVal = ConditionNumber[1];
+            }
+
+            else if(breakList[2]>=attrValue)
+            {
+                colorVal = ConditionNumber[2];
+            }
+            else if(breakList[3]>=attrValue)
+            {
+                colorVal = ConditionNumber[3];
+            }
+            else
+            {
+                colorVal = ConditionNumber[4];
+            }
+
+
+            var symbol = {"width": 1, "style": "esriSFSSolid", "angle": 0, "outline": {"color": [255, 255, 255, 255], "width": 0.8, "style": "esriSLSSolid", "type": "esriSFS"}, "color": colorVal, "yoffset": 0, "type": "esriSFS", "xoffset": 0, "length": 3};
+            var geojsonstring = {"geometry":geometry,"attributes":attributes,"symbol":symbol};
+            geojsons.push(geojsonstring);
+        }
+        var jsons = {"geojson":geojsons};
+        var strjsons=JSON.stringify(jsons);
+        //console.log(strjsons);
+        return strjsons;
+    }
+        var map;
+
+    require(["esri/map", "esri/graphic", "dojo/request/script", "dojo/number", "dojo/dom",
+                "esri/layers/ArcGISTiledMapServiceLayer", "esri/geometry/webMercatorUtils", "esri/geometry/Point",
+                "esri/SpatialReference", "esri/arcgis/utils", "dojo/on", "dojo/parser", "dojo/_base/array", "dojo/domReady!"],
+
+            function(Map, Graphic, script, number, dom, ArcGISTiledMapServiceLayer,
+                     webMercatorUtils, Point, SpatialReference, arcgisUtils, on, parser, array) {
+                dojo.parser.parse();
+                var agoServiceURL = "http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer";
+
+                var lods = [
+                    {
+                        "level": 9,
+                        "resolution": 305.74811314055756,
+                        "scale":1155581.108577
+                    }, {
+                        "level": 10,
+                        "resolution": 152.87405657041106,
+                        "scale": 577790.55428899999
+                    },
+                    {
+                        "level": 11,
+                        "resolution": 76.437028285073239,
+                        "scale": 288895.27714399999
+                    },
+                    {
+                        "level": 12,
+                        "resolution": 38.21851414253662,
+                        "scale": 144447.638572
+                    }, {
+                        "level": 13,
+                        "resolution": 19.10925707126831,
+                        "scale": 72223.819285999998
+                    }, {
+                        "level": 14,
+                        "resolution": 9.5546285356341549,
+                        "scale": 36111.909642999999
+                    }];
+
+                var map = new Map("map", {
+                    center: [116.40, 39.9],
+                    lods: lods,
+                    zoom: 4
+                });
+                var maplist = [map];
+                var dataSize = maplist.length;
+
+                var agoLayerList = [];
+                for( var i=0;i<dataSize;i++)
+                {
+                    var agoLayer = new esri.layers.ArcGISTiledMapServiceLayer(agoServiceURL);
+                    agoLayerList.push(agoLayer);
+                }
+                for( var i=0;i<dataSize;i++)
+                {
+                    maplist[i].addLayer(agoLayerList[i]);
+                }
+
+                function addmap(Inmap,geojsonp,Index)
+                {
+                    //console.log(geojsonp);
+                    //console.log(Index);
+                    Inmap.graphics.clear();
+                    var json = dojo.fromJson(geojsonp);
+
+                    dojo.forEach(json.geojson, function(g) {
+                        var graphic = new esri.Graphic(g);
+                        Inmap.graphics.add(graphic);
+                    });
+                }
+                /*
+                 dojo.connect(dojo.byId("boxtype1"),"onclick",function(evt){
+                 parametercalculation();
+                 });
+                 dojo.connect(dojo.byId("boxtype2"),"onclick",function(evt){
+                 parametercalculation();
+                 });
+                 */
+
+                function parametercalculation(theMap,typeIndex)
+                {
+
+                    xmin = theMap.extent.xmin;
+                    xmax = theMap.extent.xmax;
+                    ymin = theMap.extent.ymin;
+                    ymax = theMap.extent.ymax;
+
+                    x = (xmin+xmax)/2;
+                    y = (ymin+ymax)/2;
+                    Rx = (xmax-xmin)/2;
+                    Ry = ymax-ymin;
+                    rr = Rx;
+
+                    if ((Ry/2)>Rx){rr=Ry/2;}
+
+                    var zoomlevel = theMap.getZoom();
+                    //console.log(zoomlevel);
+                    var box_rad;
+                    switch(zoomlevel)
+                    {
+                        case 0:box_rad = 8000;break;
+                        case 1:box_rad = 4000;break;
+                        case 2:box_rad = 2000;break;
+                        case 3:box_rad = 1000;break;
+                        case 4:box_rad = 500;break;
+                        case 5:box_rad = 250;break;
+                    }
+                    //console.log(box_rad);
+
+                    var incoord = 102100;
+                    var inSR = new esri.SpatialReference({wkid: incoord });
+                    var inputpoint = new esri.geometry.Point(x, y, inSR);
+                    var PrjParams = new esri.tasks.ProjectParameters();
+                    PrjParams.geometries = [inputpoint];
+                    PrjParams.transformation = {wkid: parseInt(4326)};
+
+                    outpoint = esri.geometry.webMercatorToGeographic(inputpoint);
+                    // console.log(outpoint.x);
+                    //console.log(outpoint.y);
+                    var boxtype = 1;
+                    var params = {
+                        lon: outpoint.x,
+                        lat: outpoint.y,
+                        rad: rr,
+                        box_rad: box_rad,
+                        box_typ: boxtype
+                    };
+                    var ConditionNumbers = [[2, 99, 0,120],[88, 176, 0,120],[150, 209, 0,120],[255, 213, 0,120],[255, 38, 0,120]];
+                    switch (typeIndex) {
+                        case 0:
+                            params.db_name = 'transportation';
+                            params.tab = 'busstations';
+                            ConditionNumbers = coloful[1];
+                            break;
+                        case 1:
+                            params.db_name = 'medical';
+                            params.tab = 'hostpital';
+                            ConditionNumbers = coloful[4];
+                            break;
+                        case 2:
+                            params.db_name = 'education';
+                            params.tab = 'college';
+                            ConditionNumbers = coloful[2];
+                            break;
+                        case 3:
+                            params.db_name = 'realestate';
+                            params.tab = 'soufun_newhouse';
+                            ConditionNumbers = coloful[0];
+                            break;
+                        default:
+                            params.db_name = 'transportation';
+                            params.tab = 'busstations';
+                            ConditionNumbers = coloful[0];
+                            break;
+                    }
+                    script.get("http://beta.arcgisonline.cn:8888/query", {
+                        jsonp: "callback",
+                        query: params
+                    }).then(function(data) {
+                        console.log("ok");
+                        obj = dojo.fromJson(data);
+
+                        if (boxtype == 0) {
+                            hexagonRes = square(obj);
+                        } else {
+                            hexagonRes = hexagon(obj);
+                        }
+                        attrList = getAttrlist(hexagonRes, params.tab);
+                        attrUnique = attrList.uniqueEx();
+                        breakList = breakNum(attrUnique);
+                        strjsons = geojson(hexagonRes, breakList, params.tab,ConditionNumbers);
+                        addmap(theMap, strjsons, typeIndex);
+                        console.log("render complete");
+                    }, function(err) {
+                        console.warn("error");
+                    });
+                }
+
+                array.forEach(maplist, function(map, index) {
+                    on(map, "load", function() {
+                        parametercalculation(map, index);
+                    });
+                    on(map, "zoom-end", function() {
+                        map.graphics.clear();
+                        parametercalculation(map, index);
+                    });
+                    on(map, "pan-end", function() {
+                        parametercalculation(map, index);
+                    });
+                });
+            });
+    </script>
+
+
+
+</head>
+<body>
+<div id="map" class="map">
+</div>
+</body>
+</html>
