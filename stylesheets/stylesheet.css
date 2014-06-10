@@ -246,7 +246,6 @@ form {
   color: #474747;
 } 
 #main-content h2:before {
-  content: "//";
   color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -1.5em;
@@ -262,7 +261,6 @@ form {
 } 
  
 #main-content h3:before {
-  content: "///";
   color: #9ddcff;
   padding-right: 0.3em;
   margin-left: -2em;
