@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css"/>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <script src="js/leaflet.groupedlayercontrol.js"></script>
+    <script src="js/tile.stamen.js"></script>
+    <title>Mapbox Gallery</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+    /* Basemap Layers */
+    var mapquestToner = L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        subdomains: 'abcd',
+        minZoom: 0,
+        maxZoom: 18
+    });
+
+    var mapquestWatercolor = L.tileLayer('http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.png', {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        subdomains: 'abcd',
+        minZoom: 0,
+        maxZoom: 18
+    });
+
+    var mapquestWorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+        maxZoom: 18
+    });
+
+    var mapquestMBStreet = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i87786ca/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBSpace = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.3hqcl3di/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBRoad = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.ra3sdcxr/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBPinterest = L.tileLayer('https://{s}.tiles.mapbox.com/v3/pinterest.map-ho21rkos/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBPencil = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.a4c252ab/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBFresh = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.c7d2024a/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBGame = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.bc17bb2a/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestMBRed = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.fb8f9523/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>',
+        maxZoom: 18
+    });
+
+    var mapquestGGImage = L.tileLayer('http://mt{s}.google.com/vt/lyrs=s&gl=cn&x={x}&y={y}&z={z}&s=', {
+        attribution: 'Map tiles by <a href="http://www.google.com">Google Maps</a>',
+        subdomains: '0123',
+        minZoom: 0,
+        maxZoom: 18
+    });
+
+    var mapquestGGRoad = L.tileLayer('http://mt{s}.google.com/vt/lyrs=m&gl=cn&x={x}&y={y}&z={z}&s=', {
+        attribution: 'Map tiles by <a href="http://www.google.com">Google Maps</a>',
+        subdomains: '0123',
+        minZoom: 0,
+        maxZoom: 18
+    });
+
+    var mapquestAutoNavi = L.tileLayer('http://emap{s}.is.autonavi.com/appmaptile?&x={x}&y={y}&z={z}', {
+        attribution: 'Map tiles by <a href="http://www.amap.com">AutoNavi Maps</a>',
+        subdomains: '0123',
+        minZoom: 0,
+        maxZoom: 18
+    });
+
+    map = L.map("map", {
+        zoom: 13,
+        minZoom: 13,
+        maxZoom: 18,
+        center: [39.92, 116.39],
+        layers: [mapquestToner],
+        zoomControl: false,
+        attributionControl: false
+    });
+    var zoomControl = L.control.zoom({
+        position: "bottomright"
+    }).addTo(map);
+
+    var baseLayers = {
+        "[GCJ02]AutoNavi Road": mapquestAutoNavi,
+        "[GCJ02]Google Image": mapquestGGImage,
+        "[WGS84]Esri Image": mapquestWorldImagery,
+        "[WGS84]Stamen Toner": mapquestToner,
+        "[WGS84]Stamen Watercolor": mapquestWatercolor,
+        "[WGS84]Mapbox Street": mapquestMBStreet,
+        "[WGS84]Mapbox Space": mapquestMBSpace,
+        "[WGS84]Mapbox Road": mapquestMBRoad,
+        "[WGS84]Mapbox Pinterest": mapquestMBPinterest,
+        "[WGS84]Mapbox Pencil": mapquestMBPencil,
+        "[WGS84]Mapbox Fresh": mapquestMBFresh,
+        "[WGS84]Mapbox Game": mapquestMBGame,
+        "[WGS84]Mapbox Red": mapquestMBRed
+    };
+
+    var layerControl = L.control.groupedLayers(baseLayers).addTo(map);
+
+</script>
+
+</body>
+</html>
